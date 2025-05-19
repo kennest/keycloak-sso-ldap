@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  ldap:
+    image: osixia/openldap:1.5.0
+    container_name: ldap
+    environment:
+      - LDAP_ORGANISATION=MyOrg
+      - LDAP_DOMAIN=myorg.local
+      - LDAP_ADMIN_PASSWORD=admin
+    ports:
+      - "389:389"
+    volumes:
+      - ldap_data:/var/lib/ldap
+      - ldap_config:/etc/ldap/slapd.d
+    networks:
+      - app-network
+
+  phpldapadmin:
+    image: osixia/phpldapadmin:latest
+    container_name: phpldapadmin
+    environment:
+      - PHPLDAPADMIN_LDAP_HOSTS=ldap
+      - PHPLDAPADMIN_HTTPS=false
+      - PHPLDAPADMIN_TRUST_PROXY_SSL=false
+      - PHPLDAPADMIN_HTTP_ALLOW_IP=0.0.0.0
+      - PHPLDAPADMIN_ALLOW_LOGIN_ANY_USER=true
+    ports:
+      - "8081:80"
+    depends_on:
+      - ldap
+    networks:
+      - app-network
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    volumes:
+      - ./keycloak-db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak
+    command: start-dev
+    environment:
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://db:5432/keycloak
+      - KC_DB_USERNAME=keycloak
+      - KC_DB_PASSWORD=keycloak
+      - KC_BOOTSTRAP_ADMIN_USERNAME=admin
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
+    ports:
+      - "8080:8080"
+    volumes:
+      # Monte le dossier local 'keycloak/themes' dans le dossier des thèmes du container
+      - ./keycloak/themes:/opt/keycloak/themes
+    depends_on:
+      - ldap
+    networks:
+      - app-network
+
+  # Ajoute ce bloc à la suite de tes services existants
+  app_one:
+    build: ./app_1
+    container_name: django_app_one
+    volumes:
+      - ./app_1:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - keycloak
+    command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
+
+  app_two:
+    build: ./app_2
+    container_name: django_app_two
+    volumes:
+      - ./app_2:/app
+    ports:
+      - "8001:8001"
+    depends_on:
+      - keycloak
+    command: gunicorn core.wsgi:application --bind 0.0.0.0:8001
+    environment:
+      - OIDC_OP_TOKEN_ENDPOINT=http://keycloak:8080/realms/myrealm/protocol/openid-connect/token
+    networks:
+      - app-network
+
+volumes:
+  ldap_data:
+  ldap_config:
+  keycloak_db_data:
+
+
+networks:
+  app-network:
+    driver: bridge
