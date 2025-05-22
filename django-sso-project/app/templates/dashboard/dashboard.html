@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="card mb-4">
+            <div class="card-header">
+                Profil utilisateur
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">{{ user.get_full_name|default:user.username }}</h5>
+                <p class="card-text">
+                    <strong>Nom d'utilisateur:</strong> {{ user.username }}<br>
+                    <strong>Email:</strong> {{ user.email }}<br>
+                    {% if user.is_staff or user.is_superuser %}
+                    <span class="badge bg-warning text-dark">Staff</span>
+                    {% endif %}
+                </p>
+                <a href="{% url 'profile' %}" class="btn btn-outline-primary">Voir le profil</a>
+            </div>
+        </div>
+
+        <div class="list-group">
+            <a href="{% url 'dashboard' %}" class="list-group-item list-group-item-action active">Tableau de bord</a>
+            <a href="{% url 'profile' %}" class="list-group-item list-group-item-action">Mon profil</a>
+        </div>
+    </div>
+
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-header">
+                <h4>Tableau de bord - Vue privée</h4>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Bienvenue, {{ user.get_full_name|default:user.username }} !</h5>
+                <p class="card-text">Cette page est une <strong>vue privée</strong> accessible uniquement après authentification via Keycloak.</p>
+                
+                <hr>
+                
+                <h5>Informations d'authentification</h5>
+                <div class="alert alert-info">
+                    <p>Vous êtes authentifié via Keycloak SSO.</p>
+                </div>
+                
+                <h5>Vos informations</h5>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <tbody>
+                            <tr>
+                                <th scope="row">ID utilisateur</th>
+                                <td>{{ user.id }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Nom d'utilisateur</th>
+                                <td>{{ user.username }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Email</th>
+                                <td>{{ user.email }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Prénom</th>
+                                <td>{{ user.first_name }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Nom</th>
+                                <td>{{ user.last_name }}</td>
+                            </tr>
+                            {% if user.is_staff %}
+                            <tr>
+                                <th scope="row">Staff</th>
+                                <td>Oui</td>
+                            </tr>
+                            {% endif %}
+                            {% if user.is_superuser %}
+                            <tr>
+                                <th scope="row">Superuser</th>
+                                <td>Oui</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

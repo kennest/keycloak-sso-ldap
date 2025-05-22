@@ -66,30 +66,16 @@ services:
     networks:
       - app-network
 
-  # Ajoute ce bloc à la suite de tes services existants
-  app_one:
-    build: ./app_1
-    container_name: django_app_one
+  app:
+    build: ./app
+    container_name: django_app
     volumes:
-      - ./app_1:/app
-    ports:
-      - "8000:8000"
-    depends_on:
-      - keycloak
-    command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
-
-  app_two:
-    build: ./app_2
-    container_name: django_app_two
-    volumes:
-      - ./app_2:/app
+      - ./app:/app
     ports:
       - "8001:8001"
     depends_on:
       - keycloak
-    command: gunicorn core.wsgi:application --bind 0.0.0.0:8001
-    environment:
-      - OIDC_OP_TOKEN_ENDPOINT=http://keycloak:8080/realms/myrealm/protocol/openid-connect/token
+    command: ./entrypoint.sh
     networks:
       - app-network
 

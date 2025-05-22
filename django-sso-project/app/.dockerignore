@@ -1,0 +1,47 @@
+# Environnement virtuel Python
+venv/
+env/
+.env/
+
+# Fichiers de cache Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Fichiers de base de données
+db.sqlite3
+*.db
+
+# Fichiers de log
+*.log
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Fichiers de médias et fichiers statiques collectés
+/media/
+/staticfiles/
+
+# Dossiers de configuration IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Fichiers d'environnement et secrets
+.env
+.env.local
+.env.*.local
+*.secret
+
+# Fichiers temporaires
+.tmp/
+temp/

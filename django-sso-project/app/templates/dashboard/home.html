@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="jumbotron">
+    <h1 class="display-4">Bienvenue sur Django Keycloak SSO</h1>
+    <p class="lead">Cette page est <strong>publique</strong> et accessible à tous les utilisateurs.</p>
+    <hr class="my-4">
+    <p>Connectez-vous pour accéder au tableau de bord et aux fonctionnalités privées.</p>
+    {% if not is_authenticated %}
+    <a class="btn btn-primary btn-lg" href="{% url 'oidc_authentication_init' %}">Se connecter via Keycloak</a>
+    {% else %}
+    <a class="btn btn-success btn-lg" href="{% url 'dashboard' %}">Accéder au tableau de bord</a>
+    {% endif %}
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Authentification SSO</h5>
+                <p class="card-text">Cette application utilise Keycloak pour gérer l'authentification unique (SSO).</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Vue publique</h5>
+                <p class="card-text">Cette page est accessible à tous les utilisateurs, qu'ils soient authentifiés ou non.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Vue privée</h5>
+                <p class="card-text">Le tableau de bord est une vue privée, accessible uniquement après authentification.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
